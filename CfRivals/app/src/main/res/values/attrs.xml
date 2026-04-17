@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="app_background" format="color" />
+    <attr name="app_card" format="color" />
+    <attr name="app_text_primary" format="color" />
+    <attr name="app_text_secondary" format="color" />
+    <attr name="neon_accent" format="color" />
+</resources>
