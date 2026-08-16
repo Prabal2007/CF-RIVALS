@@ -6,16 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cfrivals.Adapter.ProblemAdapter
-import com.example.cfrivals.Api.RetrofitClient
+import com.example.cfrivals.Models.BattleLogViewModel
 import com.example.cfrivals.databinding.FragmentBattleLogBinding
-import kotlinx.coroutines.launch
 
 class BattleLogFragment : Fragment() {
+
     private var _binding: FragmentBattleLogBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: BattleLogViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,45 +30,57 @@ class BattleLogFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.rvNotSolved.layoutManager = LinearLayoutManager(requireContext())
+
+        setupRecyclerView()
+        setupRefresh()
+        observeViewModel()
+
         fetchBattleData()
     }
 
-    private fun fetchBattleData() {
-        val prefs = requireActivity().getSharedPreferences("CF_PREFS", Context.MODE_PRIVATE)
-        val myHandle = prefs.getString("my_handle", null)
-        val rivalHandle = prefs.getString("rival_handle", null)
+    private fun setupRecyclerView() {
+        binding.rvNotSolved.layoutManager = LinearLayoutManager(requireContext())
+    }
 
-        if (myHandle != null && rivalHandle != null) {
-            lifecycleScope.launch {
-                try {
-                    // 1. Get status for both
-                    val myStatus = RetrofitClient.instance.getStatus(myHandle)
-                    val rivalStatus = RetrofitClient.instance.getStatus(rivalHandle)
+    private fun setupRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            fetchBattleData()
+        }
+    }
 
-                    if (myStatus.isSuccessful && rivalStatus.isSuccessful) {
-                        val mySolved = myStatus.body()?.result
-                            ?.filter { it.verdict == "OK" }
-                            ?.map { "${it.problem.contestId}${it.problem.index}" }
-                            ?.toSet() ?: emptySet()
+    private fun observeViewModel() {
 
-                        val rivalSolvedProblems = rivalStatus.body()?.result
-                            ?.filter { it.verdict == "OK" }
-                            ?.map { it.problem }
-                            ?.distinctBy { "${it.contestId}${it.index}" } ?: emptyList()
+        viewModel.problemsToCatchUp.observe(viewLifecycleOwner) { problems ->
+            binding.rvNotSolved.adapter = ProblemAdapter(problems)
+        }
 
-                        // 2. Filter problems solved by rival but not by me
-                        val toCatchUp = rivalSolvedProblems.filter {
-                            "${it.contestId}${it.index}" !in mySolved
-                        }
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.swipeRefresh.isRefreshing = isLoading
+        }
 
-                        binding.rvNotSolved.adapter = ProblemAdapter(toCatchUp)
-                    }
-                } catch (e: Exception) {
-                    // Handle error
-                }
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                // Proper error UI will be added in a future issue.
             }
         }
+    }
+
+    private fun fetchBattleData() {
+
+        val preferences = requireActivity()
+            .getSharedPreferences("CF_PREFS", Context.MODE_PRIVATE)
+
+        val myHandle = preferences.getString("my_handle", null)
+        val rivalHandle = preferences.getString("rival_handle", null)
+
+        if (myHandle == null || rivalHandle == null) {
+            return
+        }
+
+        viewModel.fetchBattleData(
+            myHandle = myHandle,
+            rivalHandle = rivalHandle
+        )
     }
 
     override fun onDestroyView() {
