@@ -14,6 +14,7 @@ import coil3.request.crossfade
 import coil3.request.error
 import coil3.request.placeholder
 import com.example.cfrivals.Api.RetrofitClient
+import com.example.cfrivals.Models.SolvedProblemCalculator
 import com.example.cfrivals.R
 import com.example.cfrivals.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
@@ -92,8 +93,12 @@ class HomeFragment : Fragment() {
                             val status2 = RetrofitClient.instance.getStatus(rivalHandle, count = 10000)
 
                             if (status1.isSuccessful && status2.isSuccessful) {
-                                val solvedMe = status1.body()?.result?.count { it.verdict == "OK" } ?: 0
-                                val solvedRival = status2.body()?.result?.count { it.verdict == "OK" } ?: 0
+                                val solvedMe = SolvedProblemCalculator.countUniqueSolvedProblems(
+                                    status1.body()?.result?: emptyList()
+                                )
+                                val solvedRival = SolvedProblemCalculator.countUniqueSolvedProblems(
+                                    status2.body()?.result?: emptyList()
+                                )
 
                                 binding.txtMeSolved.text = solvedMe.toString()
                                 binding.txtRivalSolved.text = solvedRival.toString()

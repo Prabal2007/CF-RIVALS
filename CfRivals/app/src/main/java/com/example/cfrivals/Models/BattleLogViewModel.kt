@@ -10,7 +10,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 class BattleLogViewModel : ViewModel() {
-
     private val _problemsToCatchUp = MutableLiveData<List<Problem>>(emptyList())
     val problemsToCatchUp: LiveData<List<Problem>> = _problemsToCatchUp
 
@@ -62,13 +61,9 @@ class BattleLogViewModel : ViewModel() {
                     return@launch
                 }
 
-                val mySolvedProblems = myBody.result
-                    .asSequence()
-                    .filter { it.verdict == "OK" }
-                    .map {
-                        "${it.problem.contestId}:${it.problem.index}"
-                    }
-                    .toSet()
+                val mySolvedProblems =
+                    SolvedProblemCalculator.uniqueSolvedProblems(myBody.result)
+
 
                 val problemsToCatchUp = rivalBody.result
                     .asSequence()
