@@ -62,10 +62,10 @@ class BattleLogViewModel : ViewModel() {
                 }
 
                 val mySolvedProblems =
-                    SolvedProblemCalculator.uniqueSolvedProblems(myBody.result)
+                    SolvedProblemCalculator.uniqueSolvedProblems(myBody.result?:emptyList())
 
 
-                val problemsToCatchUp = rivalBody.result
+                val problemsToCatchUp = (rivalBody.result?:emptyList())
                     .asSequence()
                     .filter { it.verdict == "OK" }
                     .filter {

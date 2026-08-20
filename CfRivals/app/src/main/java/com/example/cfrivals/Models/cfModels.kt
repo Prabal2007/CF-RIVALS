@@ -2,7 +2,8 @@ package com.example.cfrivals.Models
 
 data class CFResponse<T>(
     val status: String,
-    val result: List<T>
+    val result: List<T>?= null,
+    val comment: String?= null
 )
 
 data class User(
