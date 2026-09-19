@@ -44,4 +44,52 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/swipeRefresh"
+        app:layout_constraintEnd_toEndOf="@id/swipeRefresh"
+        app:layout_constraintStart_toStartOf="@id/swipeRefresh"
+        app:layout_constraintTop_toTopOf="@id/swipeRefresh" />
+
+    <TextView
+        android:id="@+id/txtEmptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="You're all caught up!\nNo problems to catch up with your rival."
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textAlignment="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/swipeRefresh"
+        app:layout_constraintEnd_toEndOf="@id/swipeRefresh"
+        app:layout_constraintStart_toStartOf="@id/swipeRefresh"
+        app:layout_constraintTop_toTopOf="@id/swipeRefresh" />
+
+    <TextView
+        android:id="@+id/txtErrorState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/swipeRefresh"
+        app:layout_constraintEnd_toEndOf="@id/swipeRefresh"
+        app:layout_constraintStart_toStartOf="@id/swipeRefresh"
+        app:layout_constraintTop_toTopOf="@id/swipeRefresh" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRetry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Retry"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtErrorState" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

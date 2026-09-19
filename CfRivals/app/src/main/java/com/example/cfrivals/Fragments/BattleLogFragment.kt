@@ -35,6 +35,10 @@ class BattleLogFragment : Fragment() {
         setupRefresh()
         observeViewModel()
 
+        binding.btnRetry.setOnClickListener {
+            fetchBattleData()
+        }
+
         fetchBattleData()
     }
 
@@ -51,16 +55,41 @@ class BattleLogFragment : Fragment() {
     private fun observeViewModel() {
 
         viewModel.problemsToCatchUp.observe(viewLifecycleOwner) { problems ->
-            binding.rvNotSolved.adapter = ProblemAdapter(problems)
+            val b = _binding ?: return@observe
+            b.rvNotSolved.adapter = ProblemAdapter(problems)
+
+            if (problems.isEmpty() && viewModel.isLoading.value != true) {
+                b.rvNotSolved.visibility = View.GONE
+                b.txtEmptyState.visibility = View.VISIBLE
+            } else {
+                b.rvNotSolved.visibility = View.VISIBLE
+                b.txtEmptyState.visibility = View.GONE
+            }
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.swipeRefresh.isRefreshing = isLoading
+            val b = _binding ?: return@observe
+            b.swipeRefresh.isRefreshing = isLoading
+            b.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+
+            if (isLoading) {
+                b.txtErrorState.visibility = View.GONE
+                b.btnRetry.visibility = View.GONE
+            }
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                // Proper error UI will be added in a future issue.
+            val b = _binding ?: return@observe
+            if (error != null) {
+                b.rvNotSolved.visibility = View.GONE
+                b.txtEmptyState.visibility = View.GONE
+
+                b.txtErrorState.text = error
+                b.txtErrorState.visibility = View.VISIBLE
+                b.btnRetry.visibility = View.VISIBLE
+            } else {
+                b.txtErrorState.visibility = View.GONE
+                b.btnRetry.visibility = View.GONE
             }
         }
     }
@@ -74,6 +103,10 @@ class BattleLogFragment : Fragment() {
         val rivalHandle = preferences.getString("rival_handle", null)
 
         if (myHandle == null || rivalHandle == null) {
+            binding.txtEmptyState.text = "Set your handles in Settings to view Battle Log"
+            binding.rvNotSolved.visibility = View.GONE
+            binding.txtEmptyState.visibility = View.VISIBLE
+            binding.btnRetry.visibility = View.GONE
             return
         }
 
