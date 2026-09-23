@@ -7,7 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.example.cfrivals.Api.RetrofitClient
 import com.example.cfrivals.databinding.FragmentSettingsBinding
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import androidx.core.content.edit
 
 class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
@@ -24,12 +29,7 @@ class SettingsFragment : Fragment() {
             saveHandles()
         }
         binding.btnClear.setOnClickListener {
-            binding.editUserHandle.text?.clear()
-            binding.editRivalHandle.text?.clear()
-            val prefs = requireActivity().getSharedPreferences("CF_PREFS", Context.MODE_PRIVATE)
-            prefs.edit().clear().apply()
-
-            Toast.makeText(context, "All handles cleared!", Toast.LENGTH_SHORT).show()
+            clearHandles()
         }
         return binding.root
     }
@@ -43,30 +43,106 @@ class SettingsFragment : Fragment() {
     private fun saveHandles() {
         val myHandle = binding.editUserHandle.text.toString().trim()
         val rivalHandle = binding.editRivalHandle.text.toString().trim()
-        var isEmpty = false
+        var hasError = false
         if (myHandle.isEmpty()) {
             binding.editUserHandle.error = "Handle cannot be empty"
-            isEmpty = true
-        } else {
-            binding.editUserHandle.error = null
+            hasError = true
         }
-
         if(rivalHandle.isEmpty()) {
             binding.editRivalHandle.error = "Handle cannot be empty"
-            isEmpty = true
-        } else {
-            binding.editRivalHandle.error = null
+            hasError = true
         }
 
-        if(isEmpty) return
+        if(hasError) return
 
-        val prefs = requireActivity().getSharedPreferences("CF_PREFS", Context.MODE_PRIVATE)
-        prefs.edit().apply {
-            putString("my_handle", myHandle)
-            putString("rival_handle", rivalHandle)
-            apply()
+        if(myHandle.equals(rivalHandle, ignoreCase = true)) {
+            binding.editUserHandle.error = "Rival handle must be different from your handle"
+            return
         }
-        Toast.makeText(context, "Handles Updated! Go to Home to see changes.", Toast.LENGTH_SHORT).show()
+
+        binding.btnSave.isEnabled = false
+
+        Toast.makeText(
+            requireContext(),
+            "Validating Codeforces handles...",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val myResponse = RetrofitClient.instance.getUsers(myHandle)
+                if(!myResponse.isSuccessful) {
+                    binding.editUserHandle.error = "Unable to validate handle"
+                    return@launch
+                }
+                val myBody = myResponse.body()
+                if(myBody==null) {
+                    binding.editUserHandle.error = "Empty response from Codeforces"
+                    return@launch
+                }
+                if(myBody.status!="OK") {
+                    binding.editUserHandle.error = "Codeforces handle not found"
+                    return@launch
+                }
+
+                val rivalResponse = RetrofitClient.instance.getUsers(rivalHandle)
+                if(!rivalResponse.isSuccessful) {
+                    binding.editRivalHandle.error = "Unable to validate handle"
+                    return@launch
+                }
+                val rivalBody = rivalResponse.body()
+                if(rivalBody==null) {
+                    binding.editRivalHandle.error = "Empty response from Codeforces"
+                    return@launch
+                }
+                if(rivalBody.status!="OK") {
+                    binding.editRivalHandle.error = "Codeforces handle not found"
+                    return@launch
+                }
+
+                val prefs = requireActivity().getSharedPreferences("CF_PREFS", Context.MODE_PRIVATE)
+                prefs.edit().apply {
+                    putString("my_handle", myHandle)
+                    putString("rival_handle", rivalHandle)
+                    apply()
+                }
+                Toast.makeText(context, "Handles Updated! Go to Home to see changes.", Toast.LENGTH_SHORT).show()
+            } catch(exception: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    "Unable to validate handles. Check your internet connection.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } finally {
+                if(_binding!=null) {
+                    binding.btnSave.isEnabled = true
+                }
+            }
+        }
+    }
+
+    private fun clearHandles() {
+        binding.editUserHandle.text?.clear()
+        binding.editRivalHandle.text?.clear()
+
+        binding.editUserHandle.error = null
+        binding.editRivalHandle.error = null
+
+        val prefs = requireActivity()
+            .getSharedPreferences(
+                "CF_PREFS",
+                Context.MODE_PRIVATE
+            )
+
+        prefs.edit {
+            clear()
+        }
+
+        Toast.makeText(
+            requireContext(),
+            "All handles cleared!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onDestroyView() {
