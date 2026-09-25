@@ -5,39 +5,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/app_background">
+    android:background="?attr/app_background"
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp">
 
-        <!-- Header Battle Area -->
+        <!-- ========================================================= -->
+        <!-- BATTLE HEADER                                             -->
+        <!-- ========================================================= -->
+
         <View
             android:id="@+id/battleBackground"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="205dp"
             android:background="@drawable/bg_prof_card"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Loading indicator -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:indeterminate="true"
             android:visibility="gone"
-            app:layout_constraintTop_toTopOf="@id/battleBackground"
             app:layout_constraintBottom_toBottomOf="@id/battleBackground"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/battleBackground" />
 
+        <!-- YOUR AVATAR -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgMe"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="24dp"
+            android:contentDescription="Your Codeforces profile picture"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_avatar"
-            app:layout_constraintEnd_toStartOf="@+id/txtVs"
+            app:layout_constraintEnd_toStartOf="@id/txtVs"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/battleBackground"
@@ -45,69 +53,80 @@
             app:strokeColor="?attr/neon_accent"
             app:strokeWidth="3dp" />
 
+        <!-- VS -->
         <TextView
             android:id="@+id/txtVs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:shadowColor="#60000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3"
             android:text="VS"
             android:textColor="?attr/neon_accent"
-            android:textSize="36sp"
-            android:fontFamily="sans-serif-black"
+            android:textSize="30sp"
             android:textStyle="bold"
-            android:shadowColor="#80000000"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="4"
-            app:layout_constraintBottom_toBottomOf="@+id/imgMe"
-            app:layout_constraintEnd_toStartOf="@+id/imgRival"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/imgMe"
-            app:layout_constraintTop_toTopOf="@+id/imgMe" />
+            app:layout_constraintBottom_toBottomOf="@id/imgMe"
+            app:layout_constraintEnd_toStartOf="@id/imgRival"
+            app:layout_constraintStart_toEndOf="@id/imgMe"
+            app:layout_constraintTop_toTopOf="@id/imgMe" />
 
+        <!-- RIVAL AVATAR -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgRival"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="24dp"
+            android:contentDescription="Rival's Codeforces profile picture"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_avatar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/txtVs"
+            app:layout_constraintStart_toEndOf="@id/txtVs"
             app:layout_constraintTop_toTopOf="@id/battleBackground"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-            app:strokeColor="#FF4444"
+            app:strokeColor="@color/rival_red"
             app:strokeWidth="3dp" />
 
+        <!-- YOUR HANDLE -->
         <TextView
             android:id="@+id/txtUserHandle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
             android:gravity="center"
+            android:maxLines="1"
             android:text="You"
             android:textColor="?attr/app_text_primary"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/imgMe"
-            app:layout_constraintStart_toStartOf="@+id/imgMe"
-            app:layout_constraintTop_toBottomOf="@+id/imgMe" />
+            app:layout_constraintEnd_toEndOf="@id/imgMe"
+            app:layout_constraintStart_toStartOf="@id/imgMe"
+            app:layout_constraintTop_toBottomOf="@id/imgMe" />
 
+        <!-- RIVAL HANDLE -->
         <TextView
             android:id="@+id/txtRivalHandle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
             android:gravity="center"
+            android:maxLines="1"
             android:text="Rival"
             android:textColor="?attr/app_text_primary"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/imgRival"
-            app:layout_constraintStart_toStartOf="@+id/imgRival"
-            app:layout_constraintTop_toBottomOf="@+id/imgRival" />
+            app:layout_constraintEnd_toEndOf="@id/imgRival"
+            app:layout_constraintStart_toStartOf="@id/imgRival"
+            app:layout_constraintTop_toBottomOf="@id/imgRival" />
 
-        <!-- Status Card -->
+        <!-- ========================================================= -->
+        <!-- COMPARISON CARD                                           -->
+        <!-- ========================================================= -->
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/statsCard"
             android:layout_width="match_parent"
@@ -115,9 +134,10 @@
             android:layout_marginTop="24dp"
             app:cardBackgroundColor="?attr/app_card"
             app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:strokeColor="?attr/app_border"
             app:strokeWidth="1dp"
-            app:strokeColor="#1AFFFFFF"
-            app:layout_constraintTop_toBottomOf="@+id/battleBackground">
+            app:layout_constraintTop_toBottomOf="@id/battleBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -131,65 +151,76 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:letterSpacing="0.08"
                     android:text="FETCHING DATA..."
                     android:textColor="?attr/neon_accent"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1" />
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
+                <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginVertical="16dp"
-                    android:background="?attr/app_text_secondary"
-                    android:alpha="0.2" />
+                    android:alpha="0.25"
+                    android:background="?attr/app_border" />
 
-                <!-- Comparison Table -->
+                <!-- ================================================= -->
+                <!-- COMPARISON TABLE                                  -->
+                <!-- ================================================= -->
+
                 <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:stretchColumns="1,2">
 
+                    <!-- Header -->
                     <TableRow
                         android:layout_marginBottom="12dp">
 
                         <TextView
-                            android:text="Metric"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:text="METRIC"
                             android:textColor="?attr/app_text_secondary"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:gravity="center"
                             android:text="YOU"
-                            android:textColor="?attr/app_text_primary"
+                            android:textColor="@color/you_green"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:gravity="center"
                             android:text="RIVAL"
-                            android:textColor="?attr/app_text_primary"
+                            android:textColor="@color/rival_red"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
                     </TableRow>
 
-                    <!-- Rating Row -->
+                    <!-- Rating -->
                     <TableRow
                         android:layout_marginBottom="16dp">
 
                         <TextView
                             android:text="Rating"
                             android:textColor="?attr/app_text_primary"
-                            android:textSize="18sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/txtMeRating"
                             android:gravity="center"
                             android:text="--"
-                            android:textColor="?attr/neon_accent"
+                            android:textColor="@color/you_green"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -197,26 +228,26 @@
                             android:id="@+id/txtRivalRating"
                             android:gravity="center"
                             android:text="--"
-                            android:textColor="#FF4444"
+                            android:textColor="@color/rival_red"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
                     </TableRow>
 
-                    <!-- Solved Row -->
+                    <!-- Solved -->
                     <TableRow>
 
                         <TextView
                             android:text="Solved"
                             android:textColor="?attr/app_text_primary"
-                            android:textSize="18sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/txtMeSolved"
                             android:gravity="center"
                             android:text="--"
-                            android:textColor="?attr/neon_accent"
+                            android:textColor="@color/you_green"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -224,7 +255,7 @@
                             android:id="@+id/txtRivalSolved"
                             android:gravity="center"
                             android:text="--"
-                            android:textColor="#FF4444"
+                            android:textColor="@color/rival_red"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -232,29 +263,32 @@
 
                 </TableLayout>
 
-                <!-- Solved Problem Difference -->
+                <!-- Solved Difference -->
                 <TextView
                     android:id="@+id/txtSolvedGap"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="14dp"
                     android:gravity="center"
                     android:text="--"
                     android:textColor="?attr/app_text_secondary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <!-- Dominance Section -->
+                <!-- ================================================= -->
+                <!-- DOMINANCE                                          -->
+                <!-- ================================================= -->
+
                 <TextView
                     android:id="@+id/txtBattleDominance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
+                    android:letterSpacing="0.08"
                     android:text="BATTLE DOMINANCE"
                     android:textColor="?attr/app_text_secondary"
                     android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1" />
+                    android:textStyle="bold" />
 
                 <!-- Dominance Bar -->
                 <LinearLayout
@@ -262,23 +296,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="10dp"
                     android:layout_marginTop="12dp"
-                    android:orientation="horizontal"
+                    android:background="@drawable/bg_dominance_track"
                     android:clipToOutline="true"
-                    android:background="@drawable/bg_dominance_track">
+                    android:orientation="horizontal">
 
                     <View
                         android:id="@+id/dominanceYou"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="50"
-                        android:background="#39FF88" />
+                        android:background="@color/you_green" />
 
                     <View
                         android:id="@+id/dominanceRival"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="50"
-                        android:background="#FF4545" />
+                        android:background="@color/rival_red" />
 
                 </LinearLayout>
 
@@ -295,7 +329,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="YOU"
-                        android:textColor="#39FF88"
+                        android:textColor="@color/you_green"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
@@ -306,7 +340,7 @@
                         android:layout_weight="1"
                         android:gravity="end"
                         android:text="RIVAL"
-                        android:textColor="#FF4545"
+                        android:textColor="@color/rival_red"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
@@ -316,14 +350,21 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Retry Button -->
+        <!-- ========================================================= -->
+        <!-- RETRY BUTTON                                              -->
+        <!-- ========================================================= -->
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRetry"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginTop="16dp"
             android:text="Retry"
+            android:textColor="@color/white"
+            android:textStyle="bold"
             android:visibility="gone"
+            app:backgroundTint="?attr/neon_accent"
+            app:cornerRadius="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/statsCard" />

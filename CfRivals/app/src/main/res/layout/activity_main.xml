@@ -1,41 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/app_background">
+
+    <!-- ==================== TOP APP BAR ==================== -->
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="?attr/neon_accent"
+        android:elevation="0dp"
         android:fitsSystemWindows="true"
-        android:background="?attr/colorPrimary">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="CF Rival Tracker"
+            android:layout_height="64dp"
+            android:background="?attr/neon_accent"
+            android:elevation="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:title="CF RIVALS"
             app:titleCentered="true"
-            app:titleTextAppearance="@style/ToolbarStyle"/>
+            app:titleTextColor="@color/white" />
+
     </com.google.android.material.appbar.AppBarLayout>
+
+
+    <!-- ==================== FRAGMENT CONTENT ==================== -->
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+        android:background="?attr/app_background"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         tools:layout="@layout/fragment_home" />
+
+
+    <!-- ==================== BOTTOM NAVIGATION ==================== -->
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
+        android:layout_height="80dp"
+        android:background="?attr/app_card"
+        android:elevation="8dp"
+        app:itemIconTint="@color/bottom_nav_item_colors"
+        app:itemTextColor="@color/bottom_nav_item_colors"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemRippleColor="@color/bottom_nav_ripple"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,19 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Basic -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="neon_green">#3FFF7F</color>
-    <color name="neon_green_accent">#2BA856</color>
-    <color name="background_dark">#121212</color>
-    <color name="card_dark">#1E1E1E</color>
-    <color name="grey_placeholder_text">#80FFFFFF</color>
+    <!-- Primary brand -->
+    <color name="primary_blue">#4F8CFF</color>
+    <color name="primary_blue_light">#2563EB</color>
 
-    <color name="bg_color_light">#F8F9FA</color>
+    <!-- Semantic colors -->
+    <color name="you_green">#39D98A</color>
+    <color name="you_green_light">#16A36A</color>
+
+    <color name="rival_red">#FF5C6C</color>
+    <color name="rival_red_light">#DC4655</color>
+
+    <!-- Dark theme -->
+    <color name="background_dark">#0B1020</color>
+    <color name="card_dark">#151C2F</color>
+    <color name="text_primary_dark">#F4F7FB</color>
+    <color name="text_secondary_dark">#9AA7BD</color>
+    <color name="border_dark">#29344D</color>
+
+    <!-- Light theme -->
+    <color name="background_light">#F5F7FB</color>
+    <color name="card_light">#FFFFFF</color>
+    <color name="text_primary_light">#172033</color>
+    <color name="text_secondary_light">#667085</color>
+    <color name="border_light">#D9E0EC</color>
+
+    <!-- Compatibility names used by existing resources -->
+    <color name="neon_green">#39D98A</color>
+    <color name="neon_green_accent">#16A36A</color>
+
+    <color name="bg_color_light">#F5F7FB</color>
     <color name="card_color_light">#FFFFFF</color>
-    <color name="text_color_light">#121212</color>
+    <color name="text_color_light">#172033</color>
 
-    <color name="bg_color_dark">#121212</color>
-    <color name="card_color_dark">#1E1E1E</color>
-    <color name="text_color_dark">#FFFFFF</color>
+    <color name="bg_color_dark">#0B1020</color>
+    <color name="card_color_dark">#151C2F</color>
+    <color name="text_color_dark">#F4F7FB</color>
+
+    <color name="grey_placeholder_text">#667085</color>
+
 </resources>

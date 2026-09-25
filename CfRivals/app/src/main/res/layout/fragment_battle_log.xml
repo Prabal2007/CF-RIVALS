@@ -5,32 +5,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="?attr/app_background"
+    android:padding="20dp">
 
+    <!-- Screen title -->
     <TextView
         android:id="@+id/lblCatchUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Problems to Catch Up --->"
-        android:textAppearance="?attr/textAppearanceTitleLarge"
+        android:text="Problems to Catch Up"
+        android:textColor="?attr/app_text_primary"
+        android:textSize="28sp"
         android:textStyle="bold"
+        android:fontFamily="sans-serif-black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/dvDivider"
-        android:layout_width="match_parent"
+    <!-- Screen description -->
+    <TextView
+        android:id="@+id/txtBattleSubtitle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="12dp"
+        android:layout_marginTop="4dp"
+        android:text="Problems your rival has solved that you haven't yet."
+        android:textColor="?attr/app_text_secondary"
+        android:textSize="14sp"
+        android:lineSpacingExtra="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lblCatchUp" />
 
+    <!-- Divider -->
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/dvDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        app:dividerColor="?attr/app_border"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtBattleSubtitle" />
+
+    <!-- Problems list -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,54 +61,74 @@
             android:id="@+id/rvNotSolved"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="4dp"
+            android:paddingBottom="12dp"
+            android:scrollbars="vertical"
             tools:listitem="@layout/item_problem" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <!-- Loading state -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:indeterminate="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/swipeRefresh"
         app:layout_constraintEnd_toEndOf="@id/swipeRefresh"
         app:layout_constraintStart_toStartOf="@id/swipeRefresh"
         app:layout_constraintTop_toTopOf="@id/swipeRefresh" />
 
+    <!-- Empty state -->
     <TextView
         android:id="@+id/txtEmptyState"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
         android:gravity="center"
         android:text="You're all caught up!\nNo problems to catch up with your rival."
-        android:textAppearance="?attr/textAppearanceBodyLarge"
         android:textAlignment="center"
+        android:textColor="?attr/app_text_secondary"
+        android:textSize="16sp"
+        android:lineSpacingExtra="4dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/swipeRefresh"
         app:layout_constraintEnd_toEndOf="@id/swipeRefresh"
         app:layout_constraintStart_toStartOf="@id/swipeRefresh"
         app:layout_constraintTop_toTopOf="@id/swipeRefresh" />
 
+    <!-- Error state -->
     <TextView
         android:id="@+id/txtErrorState"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
         android:gravity="center"
         android:textAlignment="center"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@color/rival_red"
+        android:textSize="16sp"
+        android:lineSpacingExtra="4dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/swipeRefresh"
         app:layout_constraintEnd_toEndOf="@id/swipeRefresh"
         app:layout_constraintStart_toStartOf="@id/swipeRefresh"
         app:layout_constraintTop_toTopOf="@id/swipeRefresh" />
 
+    <!-- Retry action -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRetry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:minHeight="48dp"
         android:text="Retry"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         android:visibility="gone"
+        app:backgroundTint="?attr/neon_accent"
+        app:cornerRadius="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtErrorState" />
