@@ -67,27 +67,11 @@ class BattleLogViewModel : ViewModel() {
                     return@launch
                 }
 
-                // Find all problems solved by me
-                val mySolvedProblems =
-                    SolvedProblemCalculator.uniqueSolvedProblems(
-                        myBody.result ?: emptyList()
+                val problemsToCatchUp =
+                    BattleLogCalculator.problemsToCatchUp(
+                        mySubmissions = myBody.result ?: emptyList(),
+                        rivalSubmissions = rivalBody.result ?: emptyList()
                     )
-
-                // Find problems solved by rival but not by me
-                val problemsToCatchUp = (rivalBody.result ?: emptyList())
-                    .asSequence()
-                    .filter { it.verdict == "OK" }
-                    .map { it.problem }
-                    .filter { problem ->
-                        val problemKey =
-                            "${problem.contestId}:${problem.index}"
-
-                        problemKey !in mySolvedProblems
-                    }
-                    .distinctBy { problem ->
-                        "${problem.contestId}:${problem.index}"
-                    }
-                    .toList()
 
                 _problemsToCatchUp.value = problemsToCatchUp
 
