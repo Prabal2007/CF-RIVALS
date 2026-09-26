@@ -15,9 +15,12 @@ import coil3.request.crossfade
 import coil3.request.error
 import coil3.request.placeholder
 import com.example.cfrivals.Api.RetrofitClient
+import com.example.cfrivals.Models.CFSessionCache
 import com.example.cfrivals.Models.ComparisonWinner
 import com.example.cfrivals.Models.RivalComparisonCalculator
 import com.example.cfrivals.Models.SolvedProblemCalculator
+import com.example.cfrivals.Models.Submission
+import com.example.cfrivals.Models.User
 import com.example.cfrivals.R
 import com.example.cfrivals.databinding.FragmentHomeBinding
 import kotlinx.coroutines.CancellationException
@@ -67,6 +70,28 @@ class HomeFragment : Fragment() {
 
         binding.txtUserHandle.text = myHandle
         binding.txtRivalHandle.text = rivalHandle
+
+        // -------------------------------------------------
+        // Use cached data when available
+        // -------------------------------------------------
+
+        if (CFSessionCache.isValidFor(myHandle, rivalHandle)) {
+
+            val me = CFSessionCache.myUser!!
+            val rival = CFSessionCache.rivalUser!!
+            val mySubmissions = CFSessionCache.mySubmissions!!
+            val rivalSubmissions = CFSessionCache.rivalSubmissions!!
+
+            displayComparison(
+                me = me,
+                rival = rival,
+                mySubmissions = mySubmissions,
+                rivalSubmissions = rivalSubmissions
+            )
+
+            binding.progressBar.visibility = View.GONE
+            return
+        }
 
         /*
          * Use the Fragment VIEW lifecycle.
@@ -141,53 +166,13 @@ class HomeFragment : Fragment() {
                 }
 
                 // -------------------------------------------------
-                // Load profile images
-                // -------------------------------------------------
-                Log.d("HomeFragment", "My image URL: ${me.titlePhoto}")
-                Log.d("HomeFragment", "Rival image URL: ${rival.titlePhoto}")
-
-                b.imgMe.load(me.titlePhoto) {
-                    crossfade(true)
-                    placeholder(R.drawable.avatar)
-                    error(R.drawable.avatar)
-
-                    listener(
-                        onSuccess = { _, _ ->
-                            Log.d("HomeFragment", "My image loaded successfully")
-                        },
-                        onError = { _, result ->
-                            Log.e(
-                                "HomeFragment",
-                                "My image failed: ${result.throwable}"
-                            )
-                        }
-                    )
-                }
-
-                b.imgRival.load(rival.titlePhoto) {
-                    crossfade(true)
-                    placeholder(R.drawable.avatar)
-                    error(R.drawable.avatar)
-
-                    listener(
-                        onSuccess = { _, _ ->
-                            Log.d("HomeFragment", "Rival image loaded successfully")
-                        },
-                        onError = { _, result ->
-                            Log.e(
-                                "HomeFragment",
-                                "Rival image failed: ${result.throwable}"
-                            )
-                        }
-                    )
-                }
-
-                // -------------------------------------------------
-                // Display ratings
+                // Cache user information
                 // -------------------------------------------------
 
-                b.txtMeRating.text = me.rating.toString()
-                b.txtRivalRating.text = rival.rating.toString()
+                CFSessionCache.myUser = me
+                CFSessionCache.rivalUser = rival
+                CFSessionCache.cachedMyHandle = myHandle
+                CFSessionCache.cachedRivalHandle = rivalHandle
 
                 // -------------------------------------------------
                 // Fetch submissions
@@ -237,129 +222,28 @@ class HomeFragment : Fragment() {
                 }
 
                 // -------------------------------------------------
-                // Calculate solved problems
+                // Cache submissions
                 // -------------------------------------------------
 
-                val solvedMe =
-                    SolvedProblemCalculator.countUniqueSolvedProblems(
-                        statusBody1.result ?: emptyList()
-                    )
+                val mySubmissions =
+                    statusBody1.result ?: emptyList()
 
-                val solvedRival =
-                    SolvedProblemCalculator.countUniqueSolvedProblems(
-                        statusBody2.result ?: emptyList()
-                    )
+                val rivalSubmissions =
+                    statusBody2.result ?: emptyList()
 
-                currentBinding.txtMeSolved.text =
-                    solvedMe.toString()
-
-                currentBinding.txtRivalSolved.text =
-                    solvedRival.toString()
+                CFSessionCache.mySubmissions = mySubmissions
+                CFSessionCache.rivalSubmissions = rivalSubmissions
 
                 // -------------------------------------------------
-                // Compare user and rival
+                // Display comparison
                 // -------------------------------------------------
 
-                val comparison =
-                    RivalComparisonCalculator.compare(
-                        myRating = me.rating,
-                        rivalRating = rival.rating,
-                        mySolvedProblems = solvedMe,
-                        rivalSolvedProblems = solvedRival
-                    )
-
-                // -------------------------------------------------
-                // Solved problem difference
-                // -------------------------------------------------
-
-                currentBinding.txtSolvedGap.text =
-                    when (comparison.solvedWinner) {
-
-                        ComparisonWinner.YOU ->
-                            "You solved ${comparison.solvedDifference} more problems"
-
-                        ComparisonWinner.RIVAL ->
-                            "Rival solved ${-comparison.solvedDifference} more problems"
-
-                        ComparisonWinner.EQUAL ->
-                            "You both solved the same number of problems"
-                    }
-
-                // -------------------------------------------------
-                // Rating difference
-                // -------------------------------------------------
-
-                currentBinding.txtRatingGap.text =
-                    when (comparison.ratingWinner) {
-
-                        ComparisonWinner.YOU ->
-                            "You are ${comparison.ratingDifference} rating ahead"
-
-                        ComparisonWinner.RIVAL ->
-                            "You are ${-comparison.ratingDifference} rating behind"
-
-                        ComparisonWinner.EQUAL ->
-                            "You both have equal rating"
-                    }
-
-                // -------------------------------------------------
-                // Rating difference color
-                // -------------------------------------------------
-
-                val ratingColor =
-                    when (comparison.ratingWinner) {
-
-                        ComparisonWinner.YOU ->
-                            Color.GREEN
-
-                        ComparisonWinner.RIVAL ->
-                            Color.RED
-
-                        ComparisonWinner.EQUAL ->
-                            Color.BLUE
-                    }
-
-                currentBinding.txtRatingGap.setTextColor(ratingColor)
-
-                // -------------------------------------------------
-                // Dominance bar
-                // -------------------------------------------------
-
-                val myPercentage =
-                    comparison.myDominancePercentage
-
-                val rivalPercentage =
-                    100 - myPercentage
-
-                val youParams =
-                    currentBinding.dominanceYou.layoutParams
-                            as LinearLayout.LayoutParams
-
-                youParams.weight =
-                    myPercentage.toFloat()
-
-                currentBinding.dominanceYou.layoutParams =
-                    youParams
-
-                val rivalParams =
-                    currentBinding.dominanceRival.layoutParams
-                            as LinearLayout.LayoutParams
-
-                rivalParams.weight =
-                    rivalPercentage.toFloat()
-
-                currentBinding.dominanceRival.layoutParams =
-                    rivalParams
-
-                // -------------------------------------------------
-                // Dominance labels
-                // -------------------------------------------------
-
-                currentBinding.txtYouDominance.text =
-                    "YOU $myPercentage%"
-
-                currentBinding.txtRivalDominance.text =
-                    "RIVAL $rivalPercentage%"
+                displayComparison(
+                    me = me,
+                    rival = rival,
+                    mySubmissions = mySubmissions,
+                    rivalSubmissions = rivalSubmissions
+                )
 
             } catch (e: CancellationException) {
 
@@ -405,6 +289,191 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun displayComparison(
+        me: User,
+        rival: User,
+        mySubmissions: List<Submission>,
+        rivalSubmissions: List<Submission>
+    ) {
+        val b = _binding ?: return
+
+        // -------------------------------------------------
+        // Load profile images
+        // -------------------------------------------------
+
+        Log.d("HomeFragment", "My image URL: ${me.titlePhoto}")
+        Log.d("HomeFragment", "Rival image URL: ${rival.titlePhoto}")
+
+        b.imgMe.load(me.titlePhoto) {
+            crossfade(true)
+            placeholder(R.drawable.avatar)
+            error(R.drawable.avatar)
+
+            listener(
+                onSuccess = { _, _ ->
+                    Log.d(
+                        "HomeFragment",
+                        "My image loaded successfully"
+                    )
+                },
+                onError = { _, result ->
+                    Log.e(
+                        "HomeFragment",
+                        "My image failed: ${result.throwable}"
+                    )
+                }
+            )
+        }
+
+        b.imgRival.load(rival.titlePhoto) {
+            crossfade(true)
+            placeholder(R.drawable.avatar)
+            error(R.drawable.avatar)
+
+            listener(
+                onSuccess = { _, _ ->
+                    Log.d(
+                        "HomeFragment",
+                        "Rival image loaded successfully"
+                    )
+                },
+                onError = { _, result ->
+                    Log.e(
+                        "HomeFragment",
+                        "Rival image failed: ${result.throwable}"
+                    )
+                }
+            )
+        }
+
+        // -------------------------------------------------
+        // Display ratings
+        // -------------------------------------------------
+
+        b.txtMeRating.text = me.rating.toString()
+        b.txtRivalRating.text = rival.rating.toString()
+
+        // -------------------------------------------------
+        // Calculate solved problems
+        // -------------------------------------------------
+
+        val solvedMe =
+            SolvedProblemCalculator.countUniqueSolvedProblems(
+                mySubmissions
+            )
+
+        val solvedRival =
+            SolvedProblemCalculator.countUniqueSolvedProblems(
+                rivalSubmissions
+            )
+
+        b.txtMeSolved.text = solvedMe.toString()
+        b.txtRivalSolved.text = solvedRival.toString()
+
+        // -------------------------------------------------
+        // Compare user and rival
+        // -------------------------------------------------
+
+        val comparison =
+            RivalComparisonCalculator.compare(
+                myRating = me.rating,
+                rivalRating = rival.rating,
+                mySolvedProblems = solvedMe,
+                rivalSolvedProblems = solvedRival
+            )
+
+        // -------------------------------------------------
+        // Solved problem difference
+        // -------------------------------------------------
+
+        b.txtSolvedGap.text =
+            when (comparison.solvedWinner) {
+
+                ComparisonWinner.YOU ->
+                    "You solved ${comparison.solvedDifference} more problems"
+
+                ComparisonWinner.RIVAL ->
+                    "Rival solved ${-comparison.solvedDifference} more problems"
+
+                ComparisonWinner.EQUAL ->
+                    "You both solved the same number of problems"
+            }
+
+        // -------------------------------------------------
+        // Rating difference
+        // -------------------------------------------------
+
+        b.txtRatingGap.text =
+            when (comparison.ratingWinner) {
+
+                ComparisonWinner.YOU ->
+                    "You are ${comparison.ratingDifference} rating ahead"
+
+                ComparisonWinner.RIVAL ->
+                    "You are ${-comparison.ratingDifference} rating behind"
+
+                ComparisonWinner.EQUAL ->
+                    "You both have equal rating"
+            }
+
+        // -------------------------------------------------
+        // Rating difference color
+        // -------------------------------------------------
+
+        val ratingColor =
+            when (comparison.ratingWinner) {
+
+                ComparisonWinner.YOU ->
+                    Color.GREEN
+
+                ComparisonWinner.RIVAL ->
+                    Color.RED
+
+                ComparisonWinner.EQUAL ->
+                    Color.BLUE
+            }
+
+        b.txtRatingGap.setTextColor(ratingColor)
+
+        // -------------------------------------------------
+        // Dominance bar
+        // -------------------------------------------------
+
+        val myPercentage =
+            comparison.myDominancePercentage
+
+        val rivalPercentage =
+            100 - myPercentage
+
+        val youParams =
+            b.dominanceYou.layoutParams
+                    as LinearLayout.LayoutParams
+
+        youParams.weight = myPercentage.toFloat()
+
+        b.dominanceYou.layoutParams = youParams
+
+        val rivalParams =
+            b.dominanceRival.layoutParams
+                    as LinearLayout.LayoutParams
+
+        rivalParams.weight = rivalPercentage.toFloat()
+
+        b.dominanceRival.layoutParams = rivalParams
+
+        // -------------------------------------------------
+        // Dominance labels
+        // -------------------------------------------------
+
+        b.txtYouDominance.text =
+            "YOU $myPercentage%"
+
+        b.txtRivalDominance.text =
+            "RIVAL $rivalPercentage%"
+
+        b.progressBar.visibility = View.GONE
+    }
+
     // -------------------------------------------------------------
     // Reset dominance bar
     // -------------------------------------------------------------
@@ -419,8 +488,7 @@ class HomeFragment : Fragment() {
 
         youParams.weight = 0f
 
-        b.dominanceYou.layoutParams =
-            youParams
+        b.dominanceYou.layoutParams = youParams
 
         val rivalParams =
             b.dominanceRival.layoutParams
@@ -428,8 +496,7 @@ class HomeFragment : Fragment() {
 
         rivalParams.weight = 0f
 
-        b.dominanceRival.layoutParams =
-            rivalParams
+        b.dominanceRival.layoutParams = rivalParams
 
         b.txtYouDominance.text = "YOU"
         b.txtRivalDominance.text = "RIVAL"
@@ -490,9 +557,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-
         super.onDestroyView()
-
         _binding = null
     }
 }

@@ -35,30 +35,50 @@ class BattleLogFragment : Fragment() {
         setupRefresh()
         observeViewModel()
 
+        /*
+         * Retry is an explicit request for fresh data.
+         */
         binding.btnRetry.setOnClickListener {
-            fetchBattleData()
+            fetchBattleData(forceRefresh = true)
         }
 
+        /*
+         * Normal screen opening:
+         * use cached data when available.
+         */
         fetchBattleData()
     }
 
     private fun setupRecyclerView() {
-        binding.rvNotSolved.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvNotSolved.layoutManager =
+            LinearLayoutManager(requireContext())
     }
 
     private fun setupRefresh() {
+
         binding.swipeRefresh.setOnRefreshListener {
-            fetchBattleData()
+
+            /*
+             * Pull-to-refresh explicitly bypasses
+             * the session cache.
+             */
+            fetchBattleData(forceRefresh = true)
         }
     }
 
     private fun observeViewModel() {
 
         viewModel.problemsToCatchUp.observe(viewLifecycleOwner) { problems ->
-            val b = _binding ?: return@observe
-            b.rvNotSolved.adapter = ProblemAdapter(problems)
 
-            if (problems.isEmpty() && viewModel.isLoading.value != true) {
+            val b = _binding ?: return@observe
+
+            b.rvNotSolved.adapter =
+                ProblemAdapter(problems)
+
+            if (
+                problems.isEmpty() &&
+                viewModel.isLoading.value != true
+            ) {
                 b.rvNotSolved.visibility = View.GONE
                 b.txtEmptyState.visibility = View.VISIBLE
             } else {
@@ -68,9 +88,17 @@ class BattleLogFragment : Fragment() {
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+
             val b = _binding ?: return@observe
+
             b.swipeRefresh.isRefreshing = isLoading
-            b.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+
+            b.progressBar.visibility =
+                if (isLoading) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
 
             if (isLoading) {
                 b.txtErrorState.visibility = View.GONE
@@ -79,40 +107,69 @@ class BattleLogFragment : Fragment() {
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
+
             val b = _binding ?: return@observe
+
             if (error != null) {
+
                 b.rvNotSolved.visibility = View.GONE
                 b.txtEmptyState.visibility = View.GONE
 
                 b.txtErrorState.text = error
                 b.txtErrorState.visibility = View.VISIBLE
                 b.btnRetry.visibility = View.VISIBLE
+
             } else {
+
                 b.txtErrorState.visibility = View.GONE
                 b.btnRetry.visibility = View.GONE
             }
         }
     }
 
-    private fun fetchBattleData() {
+    private fun fetchBattleData(
+        forceRefresh: Boolean = false
+    ) {
 
         val preferences = requireActivity()
-            .getSharedPreferences("CF_PREFS", Context.MODE_PRIVATE)
+            .getSharedPreferences(
+                "CF_PREFS",
+                Context.MODE_PRIVATE
+            )
 
-        val myHandle = preferences.getString("my_handle", null)
-        val rivalHandle = preferences.getString("rival_handle", null)
+        val myHandle =
+            preferences.getString(
+                "my_handle",
+                null
+            )
+
+        val rivalHandle =
+            preferences.getString(
+                "rival_handle",
+                null
+            )
 
         if (myHandle == null || rivalHandle == null) {
-            binding.txtEmptyState.text = "Set your handles in Settings to view Battle Log"
-            binding.rvNotSolved.visibility = View.GONE
-            binding.txtEmptyState.visibility = View.VISIBLE
-            binding.btnRetry.visibility = View.GONE
+
+            binding.txtEmptyState.text =
+                "Set your handles in Settings to view Battle Log"
+
+            binding.rvNotSolved.visibility =
+                View.GONE
+
+            binding.txtEmptyState.visibility =
+                View.VISIBLE
+
+            binding.btnRetry.visibility =
+                View.GONE
+
             return
         }
 
         viewModel.fetchBattleData(
             myHandle = myHandle,
-            rivalHandle = rivalHandle
+            rivalHandle = rivalHandle,
+            forceRefresh = forceRefresh
         )
     }
 
