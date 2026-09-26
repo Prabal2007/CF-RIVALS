@@ -461,38 +461,6 @@ The application also uses lifecycle-aware handling for asynchronous work to redu
 
 ---
 
-## 📱 Screenshots
-
-Screenshots are intentionally not embedded yet because the repository currently does not contain finalized screenshot assets.
-
-Once screenshots are added, the recommended gallery is:
-
-| Home | Battle Log | Settings |
-|:---:|:---:|:---:|
-| Comparison dashboard | Catch-up problems | Handle management |
-
-Recommended assets:
-
-    docs/assets/home.png
-    docs/assets/battle-log.png
-    docs/assets/settings.png
-
----
-
-## 🎬 Demo
-
-A demo GIF or short screen recording can be added after the final release assets are prepared.
-
-Recommended location:
-
-    docs/assets/cf-rivals-demo.gif
-
-Suggested demo flow:
-
-**Launch → Settings → Enter Handles → Home → Comparison → Battle Log → Refresh**
-
----
-
 ## 🚀 Getting Started
 
 ### Requirements
